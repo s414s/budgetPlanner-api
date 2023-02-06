@@ -9,9 +9,7 @@ const wrapper = (fn, error) => async (req, res, next) => {
             error:
             {
                 location: error,
-                // hacer un ternario para ver si es del tipo custom con el elvis
                 message: (errorCatch?.type === "custom" ? errorCatch.message : "")
-                //message: errorCatch
             }
         });
     }
