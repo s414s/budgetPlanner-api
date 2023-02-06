@@ -4,24 +4,25 @@ module.exports.listBudget = async (req, res) => {
     const ID_user = req.user.ID;
 
     const result = await BudgetLogic.listBudgetByUser(ID_user);
-
     res.status(200).json({status:true, data: result});
-}
+};
 
 module.exports.getBudgetById = async (req, res) => {
     const ID_budget = parseInt(req.params.id_budget);
     const ID_user = req.user.ID;
 
-    if (!ID_budget) { throw "Missing data, add budget ID" };
+    if (!ID_budget){
+        throw { type: "custom", message: "missing data, add budget ID" }
+    };
 
-    const result = await BudgetLogic.getBudgetById(ID_user, ID_budget);
+    const budget = await BudgetLogic.getBudgetById(ID_user, ID_budget);
 
-    if(result.length > 0) {
-        res.status(200).json({ status: true, data: result[0] });
+    if(budget.length > 0) {
+        res.status(200).json({ status: true, data: budget[0] });
     } else {
-        res.status(204).json({ status: false })
+        throw { type: "custom", message: "no data found" }
     }
-}
+};
 
 module.exports.assignBudgetToUser = async (req, res) => {
     const required = ["ID_budget", "ID_user", "role"];
@@ -29,22 +30,27 @@ module.exports.assignBudgetToUser = async (req, res) => {
 
     // Check for missing info
     const keysBody = Object.keys( req.body );
-    let OK = true;
+    let field = true;
 
-    required.forEach(e=>{ if( !keysBody.includes(e) ){ OK = e; } })
+    required.forEach(e=>{ if( !keysBody.includes(e) ){ field = e; } })
 
-    //if(OK !== true){ return res.status(401).json({status:false, error: `need ${OK} element`}); }
-    if(OK !== true){ throw `missing information, need ${OK} element`};
+    if(field !== true){
+        throw { type: "custom", message: `missing data, add ${field}` };
+    };
 
     const userRole = await BudgetLogic.getUserRole(ID_user, ID_budget);
-    
-    if (userRole !== "creator") { throw "not allowed" }
+    if (userRole !== "creator"){
+        throw { type: "custom", message: "not allowed" };
+    };
 
     const result = await BudgetLogic.assignBudgetToUser(req.body.ID_user, req.body.ID_budget, req.body.role);
 
-    if (!result) { res.status(403).json({status:false, error:"unexpected error"}); }
+    if (!result){
+        throw { type: "custom", message: "unexpected error" };
+    };
+
     res.json({status:true, data: result[0]});
-}
+};
 
 module.exports.addBudget = async (req, res) => {
     const ID_user = req.user.ID;
@@ -56,20 +62,18 @@ module.exports.addBudget = async (req, res) => {
     required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
 
     if (field !== true) {
-        //return res.status(401).json({status:false, error: ` ${field} missing`});
-        throw `missing fields, need ${field} field`
-    }
+        throw { type: "custom", message: `missing data, add ${field}` };
+    };
     
     const result = await BudgetLogic.addBuget(req.body.title)
-
     if (result.length > 0) {
         await BudgetLogic.assignBudgetToUser(ID_user, result[0], "editor")
     } else {
-        throw "budget not created"
-    }
+        throw { type: "custom", message: "budget not created" };
+    };
 
     res.json({status:true, data: result[0]});
-}
+};
 
 module.exports.updateBudget = async (req, res) => {
     const ID_user = req.user.ID;
@@ -87,26 +91,27 @@ module.exports.updateBudget = async (req, res) => {
     });
     
     if( Object.keys(keysBody).length === 0 ){
-        return res.status(403).json({status:false, error: "please send any element to update"});
-    }
+        throw { type: "custom", message: "send elements to update" };
+    };
 
     const userRole = await BudgetLogic.getUserRole(ID_user, ID_budget);
-    if (!["creator", "editor"].includes(userRole)) { throw "not allowed" }
+    if (!["creator", "editor"].includes(userRole)){
+        throw { type: "custom", message: "not allowed" };
+    };
 
     const result = await BudgetLogic.updateBudget(ID_budget, to_update);
-
     res.json({status:true});
-}
+};
 
 module.exports.deleteBudget = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_budget = parseInt(req.params.id_budget);
 
     const userRole = await BudgetLogic.getUserRole(ID_user, ID_budget);
-    if (userRole !== "creator") { throw "not allowed" }
+    if (userRole !== "creator"){
+        throw { type: "custom", message: "not allowed" };
+    };
 
     await BudgetLogic.deleteBudget(ID_budget);
-
     res.json({status:true});
-}
-
+};
