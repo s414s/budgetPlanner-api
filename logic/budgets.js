@@ -39,7 +39,6 @@ module.exports.getBudgetById = async (ID_user, ID_budget) => {
 module.exports.assignBudgetToUser = async (ID_user, ID_budget, role) => {
     const ID_u = parseInt(ID_user);
     const ID_b = parseInt(ID_budget);
-    console.log(ID_u, ID_b, role);
 
     return await db("users_budgets").insert({
         ID_budget: ID_b,
