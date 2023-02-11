@@ -16,5 +16,5 @@ const port = 3000;
     app.use("/prices", require('./routes/prices'));
 
 app.listen(port, ()=>{
-    console.log("Estoy escuchando");
+    console.log("I am listening");
 })
