@@ -39,18 +39,13 @@ module.exports.getBudgetById = async (ID_user, ID_budget) => {
 module.exports.assignBudgetToUser = async (ID_user, ID_budget, role) => {
     const ID_u = parseInt(ID_user);
     const ID_b = parseInt(ID_budget);
+    console.log(ID_u, ID_b, role);
 
-    try {
-        return await db("users_budgets").insert({
-            ID_budget: ID_u,
-            ID_user: ID_b,
-            role
-        })
-        //res.json({status:true, data: result[0]});
-    } catch (error) {
-        return false;
-        //res.status(403).json({status:false, error:"error inesperado"});
-    }
+    return await db("users_budgets").insert({
+        ID_budget: ID_b,
+        ID_user: ID_u,
+        role: role
+    });
 };
 
 module.exports.addBuget = async (title) => {

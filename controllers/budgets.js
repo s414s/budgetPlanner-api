@@ -65,14 +65,15 @@ module.exports.addBudget = async (req, res) => {
         throw { type: "custom", message: `missing data, add ${field}` };
     };
     
-    const result = await BudgetLogic.addBuget(req.body.title)
+    const result = await BudgetLogic.addBuget(req.body.title);
+
     if (result.length > 0) {
         await BudgetLogic.assignBudgetToUser(ID_user, result[0], "editor")
     } else {
         throw { type: "custom", message: "budget not created" };
     };
 
-    res.json({status:true, data: result[0]});
+    res.json({status:true});
 };
 
 module.exports.updateBudget = async (req, res) => {
