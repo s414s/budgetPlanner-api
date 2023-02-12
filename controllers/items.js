@@ -1,6 +1,19 @@
 const GroupsLogic = require('../logic/groups');
 const ItemsLogic = require('../logic/items');
 
+module.exports.listAllItems = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_budget = parseInt(req.params.id_budget);
+
+    if (!ID_budget) {
+        throw { type: "custom", message: "missing data, add budget ID" }
+    };
+
+    const result = await ItemsLogic.listAllItems(ID_user, ID_budget);
+    res.status(200).json({status:true, data: result});
+};
+
+
 module.exports.listItems = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_group = parseInt(req.params.id_group);
@@ -9,7 +22,7 @@ module.exports.listItems = async (req, res) => {
         throw { type: "custom", message: "missing data, add group ID" }
     };
 
-    const result = await ItemsLogic.listFolders(ID_user, ID_group);
+    const result = await ItemsLogic.listItems(ID_user, ID_group);
     res.status(200).json({status:true, data: result});
 };
 
@@ -64,7 +77,7 @@ module.exports.updateItem = async (req, res) => {
         throw { type: "custom", message: "not allowed" };
     };
 
-    const result = await ItemsLogic.updateItem(ID_item, to_update);
+    await ItemsLogic.updateItem(ID_item, to_update);
     res.status(200).json({status:true});
 };
 
@@ -72,7 +85,7 @@ module.exports.deleteItem = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_item = parseInt(req.params.id_item);
 
-    if (!ID_item) { throw "Missing data, add ID of folder"; };
+    if (!ID_item) { throw "Missing data, add item ID"; };
 
     const userRole = await ItemsLogic.getUserRole(ID_user, ID_item);
     if (!["creator", "editor"].includes(userRole)){
