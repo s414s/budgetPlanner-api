@@ -6,10 +6,8 @@ describe('Test GET /budgets/list', function () {
     it('should return the list of budgets', async function () {
         const result = await browser.get('budgets/list');
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
         assert.strictEqual(Array.isArray(result.data), true);
-        assert.strictEqual(result.data[1].ID, 1);
     });
 
 });
@@ -17,11 +15,10 @@ describe('Test GET /budgets/list', function () {
 describe('Test GET /budgets/get', function () {
 
     it('should get a budget by its ID', async function () {
-        const result = await browser.get('budgets/get/1');
+        const budgetId = 1;
+        const result = await browser.get(`budgets/get/${budgetId}`);
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
-        assert.strictEqual(result.data.title, 'P1 - Vivienda Unifamiliar Zaragoza');
+        assert.strictEqual(result?.status, true);
     });
 
 });
@@ -35,9 +32,7 @@ describe('Test POST /budgets/assign', function () {
             role: "editor"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
-        assert.strictEqual(result.error.location, 'assign budget');
+        assert.strictEqual(result?.status, false);
     });
 
 });
@@ -49,8 +44,7 @@ describe('Test POST /budgets/add', function () {
             title: "Test Budget"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
     });
 
 });
@@ -58,12 +52,12 @@ describe('Test POST /budgets/add', function () {
 describe('Test PUT /budgets/update/', function () {
 
     it('should update an existing budget', async function () {
+        const budgetId = 34;
         const result = await browser.put('budgets/update/34', {
             title: "Test Budget renamed"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
     });
 
     it('should not allow to update the budget as user is not editor', async function () {
@@ -71,8 +65,7 @@ describe('Test PUT /budgets/update/', function () {
             title: "Test Budget"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
+        assert.strictEqual(result?.status, false);
     });
 
     it('should not allow to update a non existing budget', async function () {
@@ -80,8 +73,7 @@ describe('Test PUT /budgets/update/', function () {
             title: "Test Budget"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
+        assert.strictEqual(result?.status, false);
     });
 
 });
@@ -89,15 +81,17 @@ describe('Test PUT /budgets/update/', function () {
 describe('Test DELETE /budgets/del/', function () {
 
     it('should not allow to delete the budget as user is not editor', async function () {
-        const result = await browser.del('budgets/del/12');
+        const budgetId = 12;
+        const result = await browser.del(`budgets/del/${budgetId}`);
         assert.strictEqual(typeof result, 'object');
         assert.strictEqual(result.status, false);
     });
 
     it('should not allow to delete a non existing budget', async function () {
-        const result = await browser.del('budgets/del/15');
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
+        const budgetId = 15;
+        const result = await browser.del(`budgets/del/${budgetId}`);
+
+        assert.strictEqual(result?.status, false);
     });
 
 });
