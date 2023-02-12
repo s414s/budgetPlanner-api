@@ -16,7 +16,6 @@ module.exports.getPrice = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_price = parseInt(req.params.id_price);
 
- 
     if (!ID_price){
         throw { type: "custom", message: "missing data, add price ID" }
     };

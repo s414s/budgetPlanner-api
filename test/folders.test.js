@@ -4,10 +4,10 @@ const browser = require('./config/browser');
 describe('Test GET /folders/list', function () {
 
     it('should return a list of folders', async function () {
-        const result = await browser.get('budgets/list');
+        const budgetId = 1;
+        const result = await browser.get(`folders/list/${budgetId}`);
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
         assert.strictEqual(Array.isArray(result.data), true);
     });
 
@@ -19,8 +19,7 @@ describe('Test GET /folders/description', function () {
         const folderId = 1;
         const result = await browser.get(`folders/description/${folderId}`);
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
         assert.strictEqual(Array.isArray(result.data), true);
     });
 
@@ -35,8 +34,7 @@ describe('Test POST /folders/add', function () {
             name: "Test name"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
     });
 
 });
@@ -50,8 +48,7 @@ describe('Test PUT /folders/update/', function () {
             name: "test name"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, true);
+        assert.strictEqual(result?.status, true);
     });
 
     it('should not allow to update a non existing folder', async function () {
@@ -61,8 +58,7 @@ describe('Test PUT /folders/update/', function () {
             name: "test name"
         });
 
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
+        assert.strictEqual(result?.status, false);
     });
 
 });
@@ -79,8 +75,8 @@ describe('Test DELETE /folders/del/', function () {
     it('should not allow to delete a non existing folder', async function () {
         const folderId = 22;
         const result = await browser.del(`folders/del/${folderId}`);
-        assert.strictEqual(typeof result, 'object');
-        assert.strictEqual(result.status, false);
+
+        assert.strictEqual(result?.status, false);
     });
 
 });
