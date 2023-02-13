@@ -25,6 +25,18 @@ module.exports.folderDescription = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
+module.exports.folderConditions = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_folder = parseInt(req.params.id_folder);
+
+    if (!ID_folder) {
+        throw { type: "custom", message: "missing data, add folder ID" }
+    };
+
+    const result = await FoldersLogic.getFolderConditions(ID_user, ID_folder);
+    res.status(200).json({status:true, data: result});
+};
+
 module.exports.addFolder = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_budget = req.body.id_budget;

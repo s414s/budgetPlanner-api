@@ -25,6 +25,18 @@ module.exports.groupDescription = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
+module.exports.groupConditions = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_group = parseInt(req.params.id_group);
+
+    if (!ID_group) {
+        throw { type: "custom", message: "missing data, add group ID" }
+    };
+
+    const result = await GroupsLogic.getGroupConditions(ID_user, ID_group);
+    res.status(200).json({status:true, data: result});
+};
+
 module.exports.addGroup = async (req, res) => {
     const ID_user = req.user.ID;
     const required = ["id_folder", "code", "id_typeunit", "name"];

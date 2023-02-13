@@ -47,6 +47,19 @@ module.exports.getGroupDescription = async (ID_user, ID_group) => {
         .where("user.ID_user", ID_u);
 };
 
+module.exports.getGroupConditions = async (ID_user, ID_group) => {
+    const ID_u = parseInt(ID_user);
+    const ID_g = parseInt(ID_group);
+
+    return await db("groups")
+        .leftJoin("folders", "folders.ID", "groups.ID_folder")
+        .leftJoin("groups_conditions as conditions", "groups.ID", "conditions.ID_group")
+        .leftJoin("users_budgets as user", "folders.ID_budget", "user.ID_budget")
+        .select(["groups.ID as id", "conditions.description as info"])
+        .where("groups.ID", ID_g)
+        .where("user.ID_user", ID_u);
+};
+
 module.exports.addGroup = async (ID_folder, code, ID_typeunit, name) => {
     const ID_f = parseInt(ID_folder);
 
@@ -67,9 +80,9 @@ module.exports.updateGroup = async (ID_group, objInfoToUpdate) => {
 };
 
 module.exports.deleteGroup = async (ID_group) => {
-    const ID_g = parseInt(ID_g);
+    const ID_g = parseInt(ID_group);
 
     return await db("groups")
-        .where("ID", ID_group)
+        .where("ID", ID_g)
         .delete();
 };
