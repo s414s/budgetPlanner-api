@@ -7,7 +7,7 @@ const port = 3000;
     app.use(express.json());
     app.use(cors());
 
-// Rutas
+// Routes
     app.use("/budgets", require('./routes/budgets'));
     app.use("/folders", require('./routes/folders'));
     app.use("/groups", require('./routes/groups'));
