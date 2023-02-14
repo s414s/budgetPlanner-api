@@ -17,7 +17,25 @@ module.exports.getUserRole = async (ID_user, ID_folder) => {
     }
 };
 
-module.exports.listFolders = async (ID_user, ID_budget) => {
+module.exports.getFolderPath = async (ID_user, ID_folder) => {
+    const ID_u = parseInt(ID_user);
+    const ID_f = parseInt(ID_folder);
+
+    const result = await db("users_budgets as user")
+        .leftJoin("folders", "folders.ID_budget", "user.ID_budget")
+        .leftJoin("budgets", "budgets.ID", "user.ID_budget")
+        .select(["budgets.ID as budgetId", "budgets.title as budgetTitle", "folders.ID as folderId", "folders.name as folderName", "user.role as role"])
+        .where("folders.ID", ID_f)
+        .where("user.ID_user", ID_u);
+
+    if (!result.length) {
+        return 'No Budget Found'
+    } else {
+        return result[0]
+    }
+};
+
+module.exports.getListFolders = async (ID_user, ID_budget) => {
     const ID_u = parseInt(ID_user);
     const ID_b = parseInt(ID_budget);
 

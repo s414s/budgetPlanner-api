@@ -9,7 +9,19 @@ module.exports.listFolders = async (req, res) => {
         throw { type: "custom", message: "missing data, add budget ID" }
     };
 
-    const result = await FoldersLogic.listFolders(ID_user, ID_budget);
+    const result = await FoldersLogic.getListFolders(ID_user, ID_budget);
+    res.status(200).json({status:true, data: result});
+};
+
+module.exports.getFolderPath = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_folder = parseInt(req.params.id_folder);
+
+    if (!ID_folder) {
+        throw { type: "custom", message: "missing data, add folder ID" }
+    };
+
+    const result = await FoldersLogic.getFolderPath(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
 };
 

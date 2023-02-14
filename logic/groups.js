@@ -18,20 +18,39 @@ module.exports.getUserRole = async (ID_user, ID_group) => {
     }
 };
 
+module.exports.getGroupPath = async (ID_user, ID_group) => {
+    const ID_u = parseInt(ID_user);
+    const ID_g = parseInt(ID_group);
+
+    const result = await db("users_budgets as user")
+        .leftJoin("folders", "folders.ID_budget", "user.ID_budget")
+        .leftJoin("groups", "folders.ID", "groups.ID_folder")
+        .leftJoin("budgets", "budgets.ID", "user.ID_budget")
+        .select(["budgets.ID as budgetId", "budgets.title as budgetTitle", "folders.ID as folderId", "folders.name as folderName", "groups.ID as groupId", "groups.name as groupName", "user.role as role"])
+        .where("groups.ID", ID_g)
+        .where("user.ID_user", ID_u);
+    
+    if (!result.length) {
+        return 'No Budget Found'
+    } else {
+        return result[0]
+    }
+};
+
 module.exports.listGroupsByFolder = async (ID_user, ID_folder) => {
     const ID_u = parseInt(ID_user);
     const ID_f = parseInt(ID_folder);
 
     return await db("groups")
-    .select('groups.ID as id', 'groups.code', 'groups.amount', 'unit.name as unit', 'groups.name', db.raw('SUM(items.factor * prices.price) as totalPrice'))
-    .leftJoin('folders', 'folders.ID', 'groups.ID_folder')
-    .leftJoin('items', 'groups.ID', 'items.ID_groups')
-    .leftJoin('prices', 'items.ID_price', 'prices.ID')
-    .leftJoin('users_budgets as user', 'folders.ID_budget', 'user.ID_budget')
-    .leftJoin('type_unit as unit', 'unit.ID', 'groups.ID_typeunit')
-    .groupBy('groups.ID', 'user.ID_user', 'groups.code', 'groups.amount', 'unit.name', 'groups.name')
-    .where('groups.ID_folder', ID_f)
-    .where('user.ID_user', ID_u);
+        .select('groups.ID as id', 'groups.code', 'groups.amount', 'unit.name as unit', 'groups.name', db.raw('SUM(items.factor * prices.price) as totalPrice'))
+        .leftJoin('folders', 'folders.ID', 'groups.ID_folder')
+        .leftJoin('items', 'groups.ID', 'items.ID_groups')
+        .leftJoin('prices', 'items.ID_price', 'prices.ID')
+        .leftJoin('users_budgets as user', 'folders.ID_budget', 'user.ID_budget')
+        .leftJoin('type_unit as unit', 'unit.ID', 'groups.ID_typeunit')
+        .groupBy('groups.ID', 'user.ID_user', 'groups.code', 'groups.amount', 'unit.name', 'groups.name')
+        .where('groups.ID_folder', ID_f)
+        .where('user.ID_user', ID_u);
 };
 
 module.exports.getGroupDescription = async (ID_user, ID_group) => {
