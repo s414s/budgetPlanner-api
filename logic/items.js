@@ -44,7 +44,7 @@ module.exports.listItems = async (ID_user, ID_group) => {
         .leftJoin("users_budgets as user", "folders.ID_budget", "user.ID_budget")
         .leftJoin("prices", "items.ID_price", "prices.ID")
         .leftJoin("type_unit as unit", "unit.ID", "prices.ID_typeunit")
-        .select(["prices.code", "prices.price", "unit.name as unit", "prices.name", "items.factor as amount"])
+        .select(["items.ID as id", "prices.code", "prices.price", "unit.name as unit", "prices.name", "items.factor as amount"])
         .where("items.ID_groups", ID_g)
         .where("user.ID_user", ID_u);
 };
