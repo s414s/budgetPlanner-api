@@ -9,7 +9,8 @@ const wrapper = (fn, error) => async (req, res, next) => {
             error:
             {
                 location: error,
-                message: (errorCatch?.type === "custom" ? errorCatch.message : "")
+                //message: (errorCatch?.type === "custom" ? errorCatch.message : "")
+                message: errorCatch.message
             }
         });
     }
