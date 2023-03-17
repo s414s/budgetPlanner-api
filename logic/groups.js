@@ -79,14 +79,15 @@ module.exports.getGroupConditions = async (ID_user, ID_group) => {
         .where("user.ID_user", ID_u);
 };
 
-module.exports.addGroup = async (ID_folder, code, ID_typeunit, name) => {
+module.exports.addGroup = async (ID_folder, code, ID_typeunit, name, amount) => {
     const ID_f = parseInt(ID_folder);
 
     return await db("groups").insert({
         ID_folder: ID_f,
         code,
         ID_typeunit,
-        name
+        name,
+        amount
     });
 };
 
