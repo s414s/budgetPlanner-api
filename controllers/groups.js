@@ -51,7 +51,7 @@ module.exports.groupConditions = async (req, res) => {
 
 module.exports.addGroup = async (req, res) => {
     const ID_user = req.user.ID;
-    const required = ["id_folder", "code", "id_typeunit", "name"];
+    const required = ["id_folder", "code", "id_typeunit", "name", "amount"];
 
     // Check for missing fields
     const keysBody = Object.keys(req.body);
@@ -68,7 +68,7 @@ module.exports.addGroup = async (req, res) => {
         throw { type: "custom", message: "not allowed" };
     };
 
-    const result = await GroupsLogic.addGroup(req.body.id_folder, req.body.code, req.body.id_typeunit, req.body.name);
+    const result = await GroupsLogic.addGroup(req.body.id_folder, req.body.code, req.body.id_typeunit, req.body.name, req.body.amount);
 
     res.status(200).json({status:true, data: result[0]});
 };
