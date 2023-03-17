@@ -8,6 +8,7 @@ router.get("/list/:id_budget", [authToken], wrapper(CtrFolders.listFolders, "get
 router.get("/path/:id_folder", [authToken], wrapper(CtrFolders.getFolderPath, "get folders' budget name"));
 router.get("/description/:id_folder", [authToken], wrapper(CtrFolders.folderDescription, "get folder description"));
 router.get("/conditions/:id_folder", [authToken], wrapper(CtrFolders.folderConditions, "get folder conditions"));
+router.get("/measurements/:id_folder", [authToken], wrapper(CtrFolders.folderMeasurements, "get folder measurments"));
 
 router.post("/add", [authToken], wrapper(CtrFolders.addFolder, "add folder"));
 

@@ -74,6 +74,18 @@ module.exports.getFolderConditions = async (ID_user, ID_folder) => {
         .where("user.ID_user", ID_u);
 };
 
+module.exports.getFolderMeasurements = async (ID_user, ID_folder) => {
+    const ID_u = parseInt(ID_user);
+    const ID_f = parseInt(ID_folder);
+
+    return await db("folders")
+        .leftJoin("users_budgets as user", "folders.ID_budget", "user.ID_budget")
+        .leftJoin("folders_measurements as measurements", "measurements.ID_folder", "folders.ID")
+        .select(["measurements.ID as id", "measurements.quantity as quantity", "measurements.length as length","measurements.width as width","measurements.height as height"])
+        .where("folders.ID", ID_f)
+        .where("user.ID_user", ID_u);
+};
+
 module.exports.addFolder = async (ID_budget, code, name) => {
     const ID_b = parseInt(ID_budget);
 
