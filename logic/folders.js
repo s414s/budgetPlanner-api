@@ -81,7 +81,7 @@ module.exports.getFolderMeasurements = async (ID_user, ID_folder) => {
     return await db("folders")
         .leftJoin("users_budgets as user", "folders.ID_budget", "user.ID_budget")
         .leftJoin("folders_measurements as measurements", "measurements.ID_folder", "folders.ID")
-        .select(["measurements.ID as id", "measurements.quantity as quantity", "measurements.length as length","measurements.width as width","measurements.height as height"])
+        .select(["measurements.ID as id", "measurements.quantity as quantity", "measurements.length as length","measurements.width as width","measurements.height as height", "measurements.total as total", "measurements.description as comment", "measurements.formula as formula"])
         .where("folders.ID", ID_f)
         .where("user.ID_user", ID_u);
 };
