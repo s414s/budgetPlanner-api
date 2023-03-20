@@ -16,5 +16,6 @@ router.delete("/del/:id_budget", [authToken], wrapper(CtrBudgets.deleteBudget, "
 router.delete("/recycle/:id_budget", [authToken], wrapper(CtrBudgets.recycleBudget, "recycle budget"));
 router.delete("/recover/:id_budget", [authToken], wrapper(CtrBudgets.recoverBudget, "recover budget"));
 router.delete("/emptybin", [authToken], wrapper(CtrBudgets.emptyBin, "empty bin"));
+router.delete("/recoverbin", [authToken], wrapper(CtrBudgets.recoverAllBudgets, "recover bin"));
 
 module.exports = router;

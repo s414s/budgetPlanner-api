@@ -145,6 +145,13 @@ module.exports.recoverBudget = async (req, res) => {
     res.json({ status: true });
 };
 
+module.exports.recoverAllBudgets = async (req, res) => {
+    const ID_user = req.user.ID;
+
+    await BudgetLogic.recoverAllBudgets(ID_user);
+    res.json({ status: true });
+};
+
 module.exports.emptyBin = async (req, res) => {
     const ID_user = req.user.ID;
 

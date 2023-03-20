@@ -106,6 +106,15 @@ module.exports.recoverBudget = async (ID_budget) => {
         .where("ID_budget", ID_b);
 };
 
+module.exports.recoverAllBudgets = async (ID_user) => {
+    const ID_u = parseInt(ID_user);
+
+    return await db("users_budgets as user")
+        .update({ role: "creator" })
+        .where("ID_user", ID_u)
+        .where("role", "bin")
+};
+
 module.exports.emptyBin = async (ID_user) => {
     const ID_u = parseInt(ID_user);
 
