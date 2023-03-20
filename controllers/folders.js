@@ -25,7 +25,7 @@ module.exports.getFolderPath = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
-module.exports.folderDescription = async (req, res) => {
+module.exports.getFolderDescription = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
@@ -37,7 +37,7 @@ module.exports.folderDescription = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
-module.exports.folderMeasurements = async (req, res) => {
+module.exports.getFolderMeasurements = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
@@ -49,7 +49,38 @@ module.exports.folderMeasurements = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
-module.exports.folderConditions = async (req, res) => {
+module.exports.updateFolderMeasurement = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_meas = parseInt(req.params.id_meas);
+    const allow = ["quantity", "length", "width", "height", "formula", "description"];
+
+    if (!ID_meas) {
+        throw { type: "custom", message: "missing data, add measurement ID" }
+    };
+
+    let to_update = {};
+    const keysBody = Object.keys( req.body );
+
+    allow.forEach(e => {
+        if( keysBody.includes(e) ){
+            to_update[e] = req.body[e];
+        }
+    });
+
+    if( Object.keys(keysBody).length === 0 ){
+        throw { type: "custom", message: "missing data, please send any element to update" }
+    };
+
+    const userRole = await FoldersLogic.getMeasurementUserRole(ID_user, ID_meas);
+    if (!["creator", "editor"].includes(userRole)){
+        throw { type: "custom", message: "not allowed" }
+    };
+
+    await FoldersLogic.updateFolderMeasurement(ID_meas, to_update);
+    res.status(200).json({status:true});
+};
+
+module.exports.getFolderConditions = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 

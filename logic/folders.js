@@ -17,6 +17,24 @@ module.exports.getUserRole = async (ID_user, ID_folder) => {
     }
 };
 
+module.exports.getMeasurementUserRole = async (ID_user, ID_meas) => {
+    const ID_u = parseInt(ID_user);
+    const ID_m = parseInt(ID_meas);
+
+    const result = await db("folders")
+        .leftJoin("users_budgets as user", "folders.ID_budget", "user.ID_budget")
+        .leftJoin("folders_measurements as meas", "folders.ID", "meas.ID_folder")
+        .select(["user.role"])
+        .where("meas.ID", ID_m)
+        .where("user.ID_user", ID_u);
+
+    if (result[0]?.role) {
+        return result[0].role
+    } else {
+        return false
+    }
+};
+
 module.exports.getFolderPath = async (ID_user, ID_folder) => {
     const ID_u = parseInt(ID_user);
     const ID_f = parseInt(ID_folder);
@@ -84,6 +102,15 @@ module.exports.getFolderMeasurements = async (ID_user, ID_folder) => {
         .select(["measurements.ID as id", "measurements.quantity as quantity", "measurements.length as length","measurements.width as width","measurements.height as height", "measurements.total as total", "measurements.description as comment", "measurements.formula as formula"])
         .where("folders.ID", ID_f)
         .where("user.ID_user", ID_u);
+};
+
+module.exports.updateFolderMeasurement = async (ID_meas, objInfoToUpdate) => {
+    const ID_m = parseInt(ID_meas);
+    console.log(objInfoToUpdate)
+
+    return await db("folders_measurements")
+        .update(objInfoToUpdate)
+        .where("ID", ID_m);
 };
 
 module.exports.addFolder = async (ID_budget, code, name) => {
