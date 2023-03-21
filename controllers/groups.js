@@ -1,13 +1,12 @@
 const FoldersLogic = require('../logic/folders');
 const GroupsLogic = require('../logic/groups');
+const Helpers = require('../helpers/helpers');
 
 module.exports.listGroups = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder) {
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
 
     const result = await GroupsLogic.listGroupsByFolder(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
@@ -17,33 +16,27 @@ module.exports.getGroupPath = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_group = parseInt(req.params.id_group);
 
-    if (!ID_group) {
-        throw { type: "custom", message: "missing data, add group ID" }
-    };
+    if (!ID_group) { throw { type: "custom", message: "missing data, add group ID" } };
 
     const result = await GroupsLogic.getGroupPath(ID_user, ID_group);
     res.status(200).json({status:true, data: result});
 };
 
-module.exports.groupDescription = async (req, res) => {
+module.exports.getGroupDescription = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_group = parseInt(req.params.id_group);
 
-    if (!ID_group) {
-        throw { type: "custom", message: "missing data, add group ID" }
-    };
+    if (!ID_group) { throw { type: "custom", message: "missing data, add group ID" } };
 
     const result = await GroupsLogic.getGroupDescription(ID_user, ID_group);
     res.status(200).json({status:true, data: result});
 };
 
-module.exports.groupConditions = async (req, res) => {
+module.exports.getGroupConditions = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_group = parseInt(req.params.id_group);
 
-    if (!ID_group) {
-        throw { type: "custom", message: "missing data, add group ID" }
-    };
+    if (!ID_group) { throw { type: "custom", message: "missing data, add group ID" } };
 
     const result = await GroupsLogic.getGroupConditions(ID_user, ID_group);
     res.status(200).json({status:true, data: result});
@@ -53,15 +46,7 @@ module.exports.addGroup = async (req, res) => {
     const ID_user = req.user.ID;
     const required = ["id_folder", "code", "id_typeunit", "name", "amount"];
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-
-    if(field !== true){
-        throw { type: "custom", message: `missing data, add ${field}` };
-    };
+    Helpers.checkRequiredFields(required, req.body);
 
     const userRole = await FoldersLogic.getUserRole(ID_user, req.body.id_folder);
     if (!["creator", "editor"].includes(userRole)){
@@ -78,22 +63,9 @@ module.exports.updateGroup = async (req, res) => {
     const ID_group = parseInt(req.params.id_group);
     const allow = ["id_folder", "code", "name", "description", "amount"];
 
-    if (!ID_group) {
-        throw { type: "custom", message: "missing data, add group ID" }
-    };
-
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        return res.status(403).json({status:false, error: "please send any element to update"});
-    }
+    if (!ID_group) { throw { type: "custom", message: "missing data, add group ID" } };
+    
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
 
     const userRole = await GroupsLogic.getUserRole(ID_user, ID_group);
     if (!["creator", "editor"].includes(userRole)){

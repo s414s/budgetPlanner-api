@@ -1,5 +1,6 @@
 const UsersLogic = require('../logic/users');
 var crypto = require('crypto');
+const Helpers = require('../helpers/helpers');
 
 module.exports.listUsers = async (req, res) => {
     const users = await UsersLogic.getUsersList();
@@ -13,14 +14,7 @@ module.exports.getMyUser = async (req, res) => {
 module.exports.addUser = async (req, res) => {
     const required = ["name", "email", "password"];
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-    if(field !== true){
-        throw { type: "custom", message: `missing data, add ${field}` };
-    };
+    Helpers.checkRequiredFields(required, req.body);
 
     // Create password and token SHA1
     const password = crypto.createHash('sha1').update(req.body.password).digest('hex');
@@ -33,18 +27,10 @@ module.exports.addUser = async (req, res) => {
 module.exports.login = async (req, res) => {
     const required = ["email", "password"];
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-    if(field !== true){
-        throw { type: "custom", message: `missing data, add ${field}` };
-    };
+    Helpers.checkRequiredFields(required, req.body);
 
     // Create password and token SHA1
     const password = crypto.createHash('sha1').update(req.body.password).digest('hex');
-
     const user = await UsersLogic.getUser(req.body.email, password);
 
     if(user.length === 1){
@@ -58,18 +44,7 @@ module.exports.updateUser = async (req, res) => {
     const ID_user = req.user.ID;
     const allow = ["name", "email", "password"];
 
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        throw { type: "custom", message: "send any element to update" };
-    };
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
 
     await UsersLogic.updateUser(ID_user, to_update);
     res.status(200).json({status:true});

@@ -106,7 +106,6 @@ module.exports.getFolderMeasurements = async (ID_user, ID_folder) => {
 
 module.exports.updateFolderMeasurement = async (ID_meas, objInfoToUpdate) => {
     const ID_m = parseInt(ID_meas);
-    console.log(objInfoToUpdate)
 
     return await db("folders_measurements")
         .update(objInfoToUpdate)

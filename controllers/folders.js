@@ -1,13 +1,12 @@
 const BudgetLogic = require('../logic/budgets');
 const FoldersLogic = require('../logic/folders');
+const Helpers = require('../helpers/helpers');
 
 module.exports.listFolders = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_budget = parseInt(req.params.id_budget);
 
-    if (!ID_budget) {
-        throw { type: "custom", message: "missing data, add budget ID" }
-    };
+    if (!ID_budget) { throw { type: "custom", message: "missing data, add budget ID" } };
 
     const result = await FoldersLogic.getListFolders(ID_user, ID_budget);
     res.status(200).json({status:true, data: result});
@@ -17,9 +16,7 @@ module.exports.getFolderPath = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder) {
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
 
     const result = await FoldersLogic.getFolderPath(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
@@ -29,9 +26,7 @@ module.exports.getFolderDescription = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder) {
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
 
     const result = await FoldersLogic.getFolderDescription(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
@@ -41,9 +36,7 @@ module.exports.getFolderMeasurements = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder) {
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
 
     const result = await FoldersLogic.getFolderMeasurements(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
@@ -54,24 +47,11 @@ module.exports.updateFolderMeasurement = async (req, res) => {
     const ID_meas = parseInt(req.params.id_meas);
     const allow = ["quantity", "length", "width", "height", "formula", "description"];
 
-    if (!ID_meas) {
-        throw { type: "custom", message: "missing data, add measurement ID" }
-    };
+    if (!ID_meas) { throw { type: "custom", message: "missing data, add measurement ID" } };
 
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        throw { type: "custom", message: "missing data, please send any element to update" }
-    };
-
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
     const userRole = await FoldersLogic.getMeasurementUserRole(ID_user, ID_meas);
+
     if (!["creator", "editor"].includes(userRole)){
         throw { type: "custom", message: "not allowed" }
     };
@@ -84,9 +64,7 @@ module.exports.getFolderConditions = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder) {
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
 
     const result = await FoldersLogic.getFolderConditions(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
@@ -97,17 +75,9 @@ module.exports.addFolder = async (req, res) => {
     const ID_budget = req.body.id_budget;
     const required = ["id_budget", "code", "name"];
 
-    if (!ID_budget) {
-        throw { type: "custom", message: "missing data, add budget ID" }
-    };
+    if (!ID_budget) { throw { type: "custom", message: "missing data, add budget ID" } };
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-
-    if(field !== true){return res.status(401).json({status:false, error: ` ${field} missing`});}
+    Helpers.checkRequiredFields(required, req.body);
 
     const userRole = await BudgetLogic.getUserRole(ID_user, ID_budget);
     if (!["creator", "editor"].includes(userRole)){
@@ -123,29 +93,16 @@ module.exports.updateFolder = async (req, res) => {
     const ID_folder = parseInt(req.params.id_folder);
     const allow = ["code", "name"];
 
-    if (!ID_folder){
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder){ throw { type: "custom", message: "missing data, add folder ID" } };
 
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        throw { type: "custom", message: "missing data, please send any element to update" }
-    };
-
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
     const userRole = await FoldersLogic.getUserRole(ID_user, ID_folder);
+
     if (!["creator", "editor"].includes(userRole)){
         throw { type: "custom", message: "not allowed" }
     };
 
-    const result = await FoldersLogic.updateFolder(ID_folder, to_update);
+    await FoldersLogic.updateFolder(ID_folder, to_update);
     res.status(200).json({status:true});
 };
 
@@ -153,9 +110,7 @@ module.exports.deleteFolder = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
 
-    if (!ID_folder){
-        throw { type: "custom", message: "missing data, add folder ID" }
-    };
+    if (!ID_folder){ throw { type: "custom", message: "missing data, add folder ID" } };
 
     const userRole = await FoldersLogic.getUserRole(ID_user, ID_folder);
     if (!["creator", "editor"].includes(userRole)){

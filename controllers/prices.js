@@ -1,12 +1,11 @@
 const PricesLogic = require('../logic/prices');
+const Helpers = require('../helpers/helpers');
 
 module.exports.listPrices = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_budget = parseInt(req.params.id_budget);
 
-    if (!ID_budget) {
-        throw { type: "custom", message: "missing data, add budget ID" }
-    };
+    if (!ID_budget) { throw { type: "custom", message: "missing data, add budget ID" } };
 
     const result = await PricesLogic.listPrices(ID_user, ID_budget);
     res.status(200).json({status:true, data: result});
@@ -16,9 +15,7 @@ module.exports.getPrice = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_price = parseInt(req.params.id_price);
 
-    if (!ID_price){
-        throw { type: "custom", message: "missing data, add price ID" }
-    };
+    if (!ID_price){ throw { type: "custom", message: "missing data, add price ID" } };
 
     const result = await PricesLogic.getPrice(ID_user, ID_price);
     res.status(200).json({status:true, data: result});
@@ -28,15 +25,7 @@ module.exports.addPrice = async (req, res) => {
     const ID_user = req.user.ID;
     const required = ["code", "id_typeunit", "name", "price"];
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-
-    if(field !== true){
-        throw { type: "custom", message: `missing data, add ${field}` };
-    };
+    Helpers.checkRequiredFields(required, req.body);
 
     const userRole = await PricesLogic.getUserRole(ID_user, req.body.id_price);
     if (!["creator", "editor"].includes(userRole)){
@@ -52,22 +41,9 @@ module.exports.updatePrice = async (req, res) => {
     const ID_price = parseInt(req.params.id_price);
     const allow = ["code", "ID_typeunit", "name", "price"];
 
-    if (!ID_price){
-        throw { type: "custom", message: "missing data, add price ID" }
-    };
+    if (!ID_price){ throw { type: "custom", message: "missing data, add price ID" } };
 
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        return res.status(403).json({status:false, error: "please send any element to update"});
-    }
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
 
     const userRole = await PricesLogic.getUserRole(ID_user, ID_price);
     if (!["creator", "editor"].includes(userRole)){
@@ -82,9 +58,7 @@ module.exports.deletePrice = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_price = parseInt(req.params.id_price);
 
-    if (!ID_price){
-        throw { type: "custom", message: "missing data, add price ID" };
-    };
+    if (!ID_price){ throw { type: "custom", message: "missing data, add price ID" }; };
 
     const userRole = await PricesLogic.getUserRole(ID_user, ID_price);
     if (!["creator", "editor"].includes(userRole)){

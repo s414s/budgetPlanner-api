@@ -1,13 +1,12 @@
 const GroupsLogic = require('../logic/groups');
 const ItemsLogic = require('../logic/items');
+const Helpers = require('../helpers/helpers');
 
 module.exports.listAllItems = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_budget = parseInt(req.params.id_budget);
 
-    if (!ID_budget) {
-        throw { type: "custom", message: "missing data, add budget ID" }
-    };
+    if (!ID_budget) { throw { type: "custom", message: "missing data, add budget ID" } };
 
     const result = await ItemsLogic.listAllItems(ID_user, ID_budget);
     res.status(200).json({status:true, data: result});
@@ -18,9 +17,7 @@ module.exports.listItems = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_group = parseInt(req.params.id_group);
 
-    if (!ID_group) {
-        throw { type: "custom", message: "missing data, add group ID" }
-    };
+    if (!ID_group) { throw { type: "custom", message: "missing data, add group ID" } };
 
     const result = await ItemsLogic.listItems(ID_user, ID_group);
     res.status(200).json({status:true, data: result});
@@ -30,15 +27,7 @@ module.exports.addItem = async (req, res) => {
     const ID_user = req.user.ID;
     const required = ["id_price", "id_group"];
 
-    // Check for missing fields
-    const keysBody = Object.keys(req.body);
-    let field = true;
-
-    required.forEach(e => {if ( !keysBody.includes(e) ){ field = e }});
-
-    if(field !== true){
-        throw { type: "custom", message: `missing data, add ${field}` };
-    }
+    Helpers.checkRequiredFields(required, req.body);
 
     const userRole = await GroupsLogic.getUserRole(ID_user, req.body.id_group);
     if (!["creator", "editor"].includes(userRole)){
@@ -55,22 +44,9 @@ module.exports.updateItem = async (req, res) => {
     const ID_item = parseInt(req.params.id_item);
     const allow = ["factor"];
 
-    if (!ID_item){
-        throw { type: "custom", message: "missing data, add item ID" };
-    };
+    if (!ID_item){ throw { type: "custom", message: "missing data, add item ID" }; };
 
-    let to_update = {};
-    const keysBody = Object.keys( req.body );
-
-    allow.forEach(e => {
-        if( keysBody.includes(e) ){
-            to_update[e] = req.body[e];
-        }
-    });
-
-    if( Object.keys(keysBody).length === 0 ){
-        return res.status(403).json({status:false, error: "please send any element to update"});
-    };
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
 
     const userRole = await ItemsLogic.getUserRole(ID_user, ID_item);
     if (!["creator", "editor"].includes(userRole)){
