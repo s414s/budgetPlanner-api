@@ -32,6 +32,24 @@ module.exports.getFolderDescription = async (req, res) => {
     res.status(200).json({status:true, data: result});
 };
 
+module.exports.updateFolderDescription = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_folder = parseInt(req.params.id_folder);
+    const allow = ["description"];
+
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
+
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
+    const userRole = await FoldersLogic.getUserRole(ID_user, ID_folder);
+
+    if (!["creator", "editor"].includes(userRole)){
+        throw { type: "custom", message: "not allowed" }
+    };
+
+    await FoldersLogic.updateFolderDescription(ID_folder, to_update);
+    res.status(200).json({status:true});
+};
+
 module.exports.getFolderMeasurements = async (req, res) => {
     const ID_user = req.user.ID;
     const ID_folder = parseInt(req.params.id_folder);
@@ -68,6 +86,24 @@ module.exports.getFolderConditions = async (req, res) => {
 
     const result = await FoldersLogic.getFolderConditions(ID_user, ID_folder);
     res.status(200).json({status:true, data: result});
+};
+
+module.exports.updateFolderConditions = async (req, res) => {
+    const ID_user = req.user.ID;
+    const ID_folder = parseInt(req.params.id_folder);
+    const allow = ["description"];
+
+    if (!ID_folder) { throw { type: "custom", message: "missing data, add folder ID" } };
+
+    const to_update = Helpers.getObjectToUpdate(allow, req.body)
+    const userRole = await FoldersLogic.getUserRole(ID_user, ID_folder);
+
+    if (!["creator", "editor"].includes(userRole)){
+        throw { type: "custom", message: "not allowed" }
+    };
+
+    await FoldersLogic.updateFolderConditions(ID_folder, to_update);
+    res.status(200).json({status:true});
 };
 
 module.exports.addFolder = async (req, res) => {

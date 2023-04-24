@@ -14,6 +14,7 @@ router.post("/add", [authToken], wrapper(CtrFolders.addFolder, "add folder"));
 
 router.put("/update/:id_folder", [authToken], wrapper(CtrFolders.updateFolder, "update folder"));
 router.put("/measurements/:id_meas", [authToken], wrapper(CtrFolders.updateFolderMeasurement, "update folder measurement"));
+router.get("/description/:id_folder", [authToken], wrapper(CtrFolders.updateFolderDescription, "update folder description"));
 
 router.delete("/del/:id_folder", [authToken], wrapper(CtrFolders.deleteFolder, "delete folder"));
 
