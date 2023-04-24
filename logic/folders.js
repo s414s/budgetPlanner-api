@@ -80,6 +80,14 @@ module.exports.getFolderDescription = async (ID_user, ID_folder) => {
         .where("user.ID_user", ID_u);
 };
 
+module.exports.updateFolderDescription = async (ID_folder, objInfoToUpdate) => {
+    const ID_f = parseInt(ID_folder);
+
+    return await db("foldersdescription")
+        .update(objInfoToUpdate)
+        .where("ID_folder", ID_f);
+};
+
 module.exports.getFolderConditions = async (ID_user, ID_folder) => {
     const ID_u = parseInt(ID_user);
     const ID_f = parseInt(ID_folder);
@@ -90,6 +98,14 @@ module.exports.getFolderConditions = async (ID_user, ID_folder) => {
         .select(["folders.ID as id", "conditions.description as info"])
         .where("folders.ID", ID_f)
         .where("user.ID_user", ID_u);
+};
+
+module.exports.updateFolderConditions = async (ID_folder, objInfoToUpdate) => {
+    const ID_f = parseInt(ID_folder);
+
+    return await db("folders_conditions")
+        .update(objInfoToUpdate)
+        .where("ID_folder", ID_f);
 };
 
 module.exports.getFolderMeasurements = async (ID_user, ID_folder) => {
